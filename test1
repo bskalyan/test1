@@ -1,0 +1,30 @@
+import ollama
+from langdetect import detect
+
+def detect_language(text):
+    try:
+        return detect(text)
+    except:
+        return 'en'  # Default to English if detection fails
+
+def generate_response(input_text):
+    language = detect_language(input_text)
+    
+    if language != 'en':
+        prompt = f"Respond in {language} language: {input_text}"
+    else:
+        prompt = input_text
+    
+    response = ollama.chat(model='llama3.1', messages=[
+        {
+            'role': 'user',
+            'content': prompt
+        }
+    ])
+    
+    return response['message']['content']
+
+# Usage example
+user_input = "Qual è la capitale dell'Italia?"
+response = generate_response(user_input)
+print(response)
