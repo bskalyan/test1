@@ -1,0 +1,85 @@
+import ollama
+from langdetect import detect
+
+# System prompt
+SYSTEM_PROMPT = """You are an advanced AI assistant powered by LLaMA 3.1, simulating a panel of three distinguished experts tasked with addressing user queries collaboratively. Your responses must be based solely on your database and if user ask question in different language respond in that language."""
+
+def detect_language(text):
+    try:
+        return detect(text)
+    except:
+        return 'en'  # Default to English if detection fails
+
+def generate_response(query, language):
+    prompt = f"{SYSTEM_PROMPT}\n\nUser query: {query}"
+    
+    response = ollama.chat(model='llama3.1', messages=[
+        {
+            'role': 'system',
+            'content': prompt
+        }
+    ])
+    
+    return response['message']['content'].strip()
+
+def main():
+    print("Welcome to the AI Expert Panel. Ask your question in any language.")
+    
+    while True:
+        user_input = input("\nYour question (or 'quit' to exit): ")
+        
+        if user_input.lower() == 'quit':
+            print("Thank you for using the AI Expert Panel. Goodbye!")
+            break
+        
+        language = detect_language(user_input)
+        
+        if language != 'en':
+            print(f"Detected language: {language}")
+            print("Generating response in the detected language...")
+        else:
+            print("Generating response...")
+        
+        response = generate_response(user_input, language)
+        print("\nExpert Panel Response:")
+        print(response)
+
+if __name__ == "__main__":
+    main()
+
+=============
+
+pip install ollama langdetect
+ollama pull llama3.1
+python expert_panel.py
+Your question (or 'quit' to exit): ¿Cuáles son los principales desafíos de la inteligencia artificial en la actualidad?
+
+=====
+
+Open a new Jupyter Notebook.
+In the first cell, import the necessary modules and functions from your expert_panel.py file:
+python
+from expert_panel import detect_language, generate_response
+
+In the next cell, set up the question:
+python
+question = "¿Cuáles son los principales desafíos de la inteligencia artificial en la actualidad?"
+
+Detect the language and generate the response:
+python
+language = detect_language(question)
+response = generate_response(question, language)
+
+Print the response:
+python
+print(f"Detected language: {language}")
+print("\nExpert Panel Response:")
+print(response)
+
+Run each cell in order.
+The output should look similar to this:
+text
+Detected language: es
+
+Expert Panel Response:
+[The AI's response in Spanish about the main challenges of artificial intelligence today]
