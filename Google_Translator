@@ -1,0 +1,53 @@
+import langdetect
+from deep_translator import GoogleTranslator
+
+def translate_to_english(question):
+    try:
+        # Detect the language of the input question
+        detected_lang = langdetect.detect(question)
+        
+        # If the detected language is not English, translate to English
+        if detected_lang != 'en':
+            translator = GoogleTranslator(source=detected_lang, target='en')
+            translated_question = translator.translate(question)
+            return {
+                'original_question': question,
+                'original_language': detected_lang,
+                'english_question': translated_question,
+                'translated': True
+            }
+        else:
+            # If the question is already in English, return it as is
+            return {
+                'original_question': question,
+                'original_language': 'en',
+                'english_question': question,
+                'translated': False
+            }
+    except Exception as e:
+        return {
+            'error': f"Error processing '{question}': {str(e)}"
+        }
+
+# Example usage
+if __name__ == "__main__":
+    questions = [
+        "How are you?",
+        "Comment allez-vous?",
+        "¿Cómo estás?",
+        "Wie geht es dir?",
+        "Come stai?",
+        "你好吗？",
+        "Как дела?",
+        "お元気ですか？"
+    ]
+
+    for question in questions:
+        result = translate_to_english(question)
+        if 'error' in result:
+            print(result['error'])
+        else:
+            print(f"Original ({result['original_language']}): {result['original_question']}")
+            print(f"English: {result['english_question']}")
+            print(f"Translated: {result['translated']}")
+            print()
